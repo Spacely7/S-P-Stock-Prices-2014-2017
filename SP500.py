@@ -29,7 +29,7 @@ This app analyzes the stock prices of S&P 500 companies from 2014 to 2017.
 @st.cache_data
 def load_data():
     # This is a placeholder. You would replace this with your actual data loading code
-    df = pd.read_csv('C:/Users/Testhy/PycharmProjects/UnSupervised/S&P 500 Stock Prices 2014-2017.csv')
+    df = pd.read_csv('S&P 500 Stock Prices 2014-2017.csv')
 
     # Creating sample data based on the provided format
     # In a real app, replace this with reading your actual dataset
