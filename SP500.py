@@ -74,7 +74,7 @@ df = load_data()
 st.sidebar.title("Navigation")
 options = st.sidebar.radio("Select a page:",
                            ["Overview", "Stock Price Analysis", "Volume Analysis", "Technical Indicators",
-                            "Comparative Analysis", "Data Explorer"])
+                            "Comparative Analysis", "Data Explorer", "Predictive Modeling"])
 
 # Overview page
 if options == "Overview":
