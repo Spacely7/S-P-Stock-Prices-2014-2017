@@ -593,6 +593,79 @@ elif options == "Data Explorer":
                 opacity=0.6
             )
             st.plotly_chart(fig, use_container_width=True)
+            
+# Predictive Modeling Page
+elif options == "Predictive Modeling":
+    st.header("Stock Price Prediction Using Linear Regression")
+
+    # Select stock for prediction
+    pred_stock = st.selectbox(
+        "Select a stock to predict its closing price:",
+        options=sorted(df['symbol'].unique())
+    )
+
+    # Filter data
+    stock_df = df[df['symbol'] == pred_stock].copy()
+
+    # Sort by date and reset index
+    stock_df.sort_values('date', inplace=True)
+    stock_df.reset_index(drop=True, inplace=True)
+
+    # Feature Engineering: Convert date to ordinal
+    stock_df['date_ordinal'] = stock_df['date'].map(datetime.toordinal)
+
+    # Features and target
+    X = stock_df[['date_ordinal']]
+    y = stock_df['close']
+
+    # Train-test split
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+
+    # Linear Regression
+    from sklearn.linear_model import LinearRegression
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    # Predictions
+    y_pred = model.predict(X_test)
+    y_train_pred = model.predict(X_train)
+
+    # Evaluation Metrics
+    from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_percentage_error
+
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    train_r2 = r2_score(y_train, y_train_pred)
+    test_r2 = r2_score(y_test, y_pred)
+    mape = mean_absolute_percentage_error(y_test, y_pred)
+
+    st.subheader("Model Performance")
+    st.write(f"**RMSE:** {rmse:.2f}")
+    st.write(f"**Train R-Squared:** {train_r2:.4f}")
+    st.write(f"**Test R-Squared:** {test_r2:.4f}")
+    st.write(f"**MAPE:** {mape:.4f}")
+
+    # Plot actual vs predicted
+    st.subheader("Actual vs Predicted Close Prices")
+    pred_df = pd.DataFrame({
+        'Date': stock_df.iloc[y_test.index]['date'],
+        'Actual': y_test.values,
+        'Predicted': y_pred
+    })
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=pred_df['Date'], y=pred_df['Actual'], mode='lines+markers', name='Actual'))
+    fig.add_trace(go.Scatter(x=pred_df['Date'], y=pred_df['Predicted'], mode='lines+markers', name='Predicted'))
+
+    fig.update_layout(
+        title=f'{pred_stock} - Actual vs Predicted Close Prices',
+        xaxis_title='Date',
+        yaxis_title='Price ($)',
+        template='plotly_white'
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # Add footer
 st.markdown("---")
